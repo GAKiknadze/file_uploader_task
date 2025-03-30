@@ -1,0 +1,40 @@
+from fastapi import Request, status
+from fastapi.responses import JSONResponse
+
+from ..services.exceptions import (
+    AccessDeniedExc,
+    BadRequestExc,
+    NotAuthorizedExc,
+    ObjectNotFoundExc,
+    SomethingWrongExc,
+)
+
+
+async def bad_request_exc_handler(request: Request, exc: BadRequestExc):
+    return JSONResponse(
+        status_code=status.HTTP_400_BAD_REQUEST,
+    )
+
+
+async def not_authorized_exc_handler(request: Request, exc: NotAuthorizedExc):
+    return JSONResponse(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+    )
+
+
+async def access_denied_exc_handler(request: Request, exc: AccessDeniedExc):
+    return JSONResponse(
+        status_code=status.HTTP_403_FORBIDDEN,
+    )
+
+
+async def object_not_found_exc_handler(request: Request, exc: ObjectNotFoundExc):
+    return JSONResponse(
+        status_code=status.HTTP_404_NOT_FOUND,
+    )
+
+
+async def all_exc_handler(request: Request, exc: SomethingWrongExc | Exception):
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+    )
