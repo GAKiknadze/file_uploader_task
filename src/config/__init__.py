@@ -8,12 +8,17 @@ from .yandex import Yandex
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict()
-    server: Server = Server()
-    jwt: JWT = JWT()
-    yandex: Yandex = Yandex()
-    file: File = File()
-    db: DB = DB()
+    server: Server
+    jwt: JWT
+    yandex: Yandex
+    file: File
+    db: DB
+    
+    model_config = SettingsConfigDict(
+        env_nested_delimiter='_',
+        env_nested_max_split=1,
+        env_file = ".env",
+    )
 
 
 settings = Settings()
