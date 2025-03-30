@@ -82,11 +82,11 @@ class FileService:
     async def upload(
         db: AsyncSession, user: User, upload_file: UploadFile
     ) -> File | None:
-        if upload_file.content_type not in settings.file.supported_formats:
+        if "*" not in settings.file.supported_formats and upload_file.content_type not in settings.file.supported_formats:
             logger.debug(f"Invalid file type: {upload_file.content_type}")
             raise BadRequestExc("Invalid file type")
 
-        user_dir = Path(settings.file.upload_path) / str(user.id)
+        user_dir = Path("/uploads") / str(user.id)
         user_dir.mkdir(exist_ok=True, parents=True)
 
         file_ext = upload_file.filename.split(".")[-1]
