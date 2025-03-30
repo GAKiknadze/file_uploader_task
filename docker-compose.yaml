@@ -1,0 +1,26 @@
+services:
+  db:
+    image: postgres:16
+    restart: always
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-file_uploader}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+    ports:
+      - '5432:5432'
+    volumes: 
+      - db:/var/lib/postgresql/data
+  
+  file_uploader:
+    build: .
+    image: local/file_uploader
+    container_name: 'file_uploader'
+    restart: always
+    ports:
+      - '8000:8000'
+    env_file:
+      - .env
+
+volumes:
+  db:
+    driver: local
