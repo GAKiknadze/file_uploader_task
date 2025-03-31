@@ -16,8 +16,9 @@ from ..services.user import UserService
 __INVALID_EXC = NotAuthorizedExc("Invalid token")
 
 
-class AccessType(UserRole):
-    pass
+class AccessType(Enum):
+    ADMIN = "ADMIN"
+    CLIENT = "CLIENT"
 
 
 class TokenType(Enum):
