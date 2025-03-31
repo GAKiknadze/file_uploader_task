@@ -8,8 +8,8 @@ from .common import ObjectListAdminFilters, ObjectListRequest
 
 
 class FileBase(BaseModel):
-    filename: str = Field(..., max_length=255, example="my_song.mp3")
-    format: str = Field(..., max_length=10, example="mp3")
+    filename: str = Field(None, max_length=255, example="my_song.mp3")
+    format: str = Field(None, max_length=10, example="mp3")
 
 
 class FileUpdate(BaseModel):
