@@ -40,7 +40,7 @@ async def get_user_by_id(
     _: User = Depends(AuthService.requires_role([AccessType.ADMIN])),
     db: AsyncSession = Depends(get_db),
 ) -> User:
-    obj = await UserService.get_by_id(db, user_id, include_deleted=True)
+    obj = await UserService.get_by_id(db, str(user_id), include_deleted=True)
     if obj is None:
         raise ObjectNotFoundExc(f"User with id {user_id} not found")
     return obj
@@ -53,7 +53,7 @@ async def update_user_by_id(
     db: AsyncSession = Depends(get_db),
     data: UserUpdateAdminRequest = Body(),
 ) -> User:
-    return await UserService.update_by_id(db, user_id, data)
+    return await UserService.update_by_id(db, str(user_id), data)
 
 
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -63,7 +63,7 @@ async def delete_user_by_id(
     _: User = Depends(AuthService.requires_role([AccessType.ADMIN])),
     db: AsyncSession = Depends(get_db),
 ) -> None:
-    await UserService.delete_by_id(db, user_id, is_hard=is_hard)
+    await UserService.delete_by_id(db, str(user_id), is_hard=is_hard)
 
 
 @router.post("/{user_id}/restore", response_model=UserAdminResponse)
@@ -72,7 +72,7 @@ async def restore_user_by_id(
     _: User = Depends(AuthService.requires_role([AccessType.ADMIN])),
     db: AsyncSession = Depends(get_db),
 ) -> User:
-    return await UserService.restore_by_id(db, user_id)
+    return await UserService.restore_by_id(db, str(user_id))
 
 
 @router.get("/me", response_model=UserAdminResponse | UserResponse)
@@ -95,7 +95,7 @@ async def update_my_info(
     db: AsyncSession = Depends(get_db),
     data: UserUpdate = Body(),
 ) -> UserAdminResponse | UserResponse:
-    obj = await UserService.update_by_id(db, user.id, data)
+    obj = await UserService.update_by_id(db, str(user.id), data)
     if user.role == UserRole.ADMIN:
         return UserAdminResponse.model_validate(obj)
     else:
@@ -109,4 +109,4 @@ async def delete_my_info(
     ),
     db: AsyncSession = Depends(get_db),
 ) -> None:
-    await UserService.delete_by_id(db, user.id, is_hard=False)
+    await UserService.delete_by_id(db, str(user.id), is_hard=False)

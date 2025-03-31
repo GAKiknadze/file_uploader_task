@@ -1,11 +1,15 @@
 import uuid
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
 from .base import Base
 
+
+if TYPE_CHECKING:
+    from .user import User
 
 class File(Base):
     __tablename__ = "files"

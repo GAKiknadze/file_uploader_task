@@ -31,7 +31,7 @@ class FileService:
         offset: int = 0,
         limit: int = 100,
         is_history: bool = True,
-    ) -> List[File]:
+    ) -> tuple[List[File], int]:
         query = select(File)
         query_count = select(func.count()).select_from(File)
 
@@ -81,7 +81,7 @@ class FileService:
     @staticmethod
     async def upload(
         db: AsyncSession, user: User, upload_file: UploadFile
-    ) -> File | None:
+    ) -> File:
         if (
             "*" not in settings.file.supported_formats
             and upload_file.content_type not in settings.file.supported_formats
@@ -92,13 +92,13 @@ class FileService:
         user_dir = Path("/uploads") / str(user.id)
         user_dir.mkdir(exist_ok=True, parents=True)
 
-        file_ext = upload_file.filename.split(".")[-1]
+        file_ext = str(upload_file.filename).split(".")[-1]
         file_id = str(uuid.uuid4())
         filename = f"{file_id}.{file_ext}"
         file_path = user_dir / filename
         temp_path = file_path.with_suffix(".tmp")
-
-        new_file: File = None
+        
+        new_file: File
 
         try:
             file_size = 0
@@ -115,9 +115,9 @@ class FileService:
             new_file = File(
                 id=file_id,
                 user_id=user.id,
-                filename=upload_file.filename,
+                filename=str(upload_file.filename),
                 size=file_size,
-                format=upload_file.content_type.split("/")[-1],
+                format=str(upload_file.content_type).split("/")[-1],
                 path=str(file_path),
             )
 
@@ -187,7 +187,7 @@ class FileService:
                 pass
             await db.delete(file)
         else:
-            file.deleted_at = datetime.utcnow()
+            file.deleted_at = datetime.now(datetime.timezone.utc)
 
         try:
             await db.commit()

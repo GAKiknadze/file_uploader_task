@@ -33,7 +33,7 @@ async def get_files_list(
         body.include_deleted = False
     files, count = await FileService.get_list(
         db,
-        user.id,
+        str(user.id),
         include_deleted=body.include_deleted,
         offset=body.offset,
         limit=body.limit,
@@ -57,12 +57,12 @@ async def upload_file(
     ),
     db: AsyncSession = Depends(get_db),
 ) -> FileAdminResponse | FileResponse:
-    file = await FileService.upload(db, user, file)
+    obj = await FileService.upload(db, user, file)
 
     if user.role == UserRole.ADMIN:
-        return FileAdminResponse.model_validate(file)
+        return FileAdminResponse.model_validate(obj)
     else:
-        return FileResponse.model_validate(file)
+        return FileResponse.model_validate(obj)
 
 
 @router.get("/{file_id}", response_model=FileAdminResponse | FileResponse)
@@ -77,7 +77,7 @@ async def get_file_info_by_id(
     if user.role == UserRole.ADMIN:
         include_deleted = True
     file = await FileService.get_info_by_id(
-        db, file_id, include_deleted=include_deleted
+        db, str(file_id), include_deleted=include_deleted
     )
 
     if user.role == UserRole.ADMIN:
@@ -94,8 +94,8 @@ async def download_file_by_id(
     ),
     db: AsyncSession = Depends(get_db),
 ) -> FastFileResponse:
-    file = await FileService.download_by_id(db, file_id, user)
-    return FastFileResponse(path=file.path, media_type=file.format)
+    file = await FileService.download_by_id(db, str(file_id), user)
+    return FastFileResponse(path=file.path, media_type=str(file.format))
 
 
 @router.patch("/{file_id}", response_model=FileAdminResponse | FileResponse)
@@ -107,7 +107,7 @@ async def update_file_info_by_id(
     db: AsyncSession = Depends(get_db),
     body: FileUpdate = Body(),
 ) -> FileAdminResponse | FileResponse:
-    file = await FileService.update_info_by_id(db, file_id, body, user)
+    file = await FileService.update_info_by_id(db, str(file_id), body, user)
     if user.role == UserRole.ADMIN:
         return FileAdminResponse.model_validate(file)
     else:
@@ -125,4 +125,4 @@ async def delete_file_by_id(
 ) -> None:
     if user.role == AccessType.CLIENT:
         is_hard = False
-    await FileService.delete_by_id(db, file_id, user, is_hard=is_hard)
+    await FileService.delete_by_id(db, str(file_id), user, is_hard=is_hard)

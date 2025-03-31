@@ -13,14 +13,14 @@ class GetUsersListAdminRequest(ObjectListAdminFilters, ObjectListRequest):
 
 class UserBase(BaseModel):
     email: EmailStr | None = Field(None, example="user@example.com", max_length=255)
-    login: str = Field(..., min_length=3, max_length=50, example="john_doe")
+    login: str = Field(None, min_length=3, max_length=50, example="john_doe")
     name: str | None = Field(None, max_length=100, example="John Doe")
 
 
 class UserUpdate(BaseModel):
     email: EmailStr | None = Field(None, example="user@example.com", max_length=255)
-    name: str | None = Field(None, example="New Name")
-    login: str | None = Field(None, example="new_login")
+    name: str | None = Field(None, max_length=100, example="John Doe")
+    login: str | None = Field(None, min_length=3, max_length=50, example="john_doe")
 
 
 class UserResponse(UserBase):

@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-
+from typing import Any
 from ..config import settings
 
 engine = create_async_engine(
@@ -19,7 +19,7 @@ async_session = sessionmaker(
 Base = declarative_base()
 
 
-async def get_db() -> AsyncSession:
+async def get_db() -> Any:
     async with async_session() as session:
         try:
             yield session

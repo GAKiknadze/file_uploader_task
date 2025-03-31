@@ -28,7 +28,7 @@ app.add_middleware(
 
 
 @app.on_event("startup")
-async def startup_event():
+async def startup_event() -> None:
     try:
         async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
@@ -41,7 +41,7 @@ async def startup_event():
 
 
 @app.on_event("shutdown")
-async def shutdown_event():
+async def shutdown_event() -> None:
     await engine.dispose()
 
 

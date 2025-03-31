@@ -13,7 +13,7 @@ class FileBase(BaseModel):
 
 
 class FileUpdate(BaseModel):
-    filename: Optional[str] = Field(None, max_length=255, example="new_filename.mp3")
+    filename: str | None = Field(None, max_length=255, example="new_filename.mp3")
 
 
 class FileResponse(FileBase):

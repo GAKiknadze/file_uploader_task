@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from enum import Enum
+from typing import List, Callable, Dict, Any
 
 from fastapi import Depends, Header
 from jose import JWTError, jwt
@@ -51,11 +52,11 @@ class AuthService:
         )
 
     @staticmethod
-    async def get_or_create_user(db: AsyncSession, yandex_data: dict) -> User:
-        user = await db.execute(select(User).where(User.yandex_id == yandex_data["id"]))
-        user = user.scalars().first()
+    async def get_or_create_user(db: AsyncSession, yandex_data: Dict[str, Any]) -> User:
+        result = await db.execute(select(User).where(User.yandex_id == yandex_data["id"]))
+        user = result.scalars().first()
 
-        if not user:
+        if user is None:
             user = User(
                 yandex_id=yandex_data["id"],
                 email=yandex_data.get("default_email"),
@@ -69,8 +70,10 @@ class AuthService:
         return user
 
     @staticmethod
-    def verify_token(token: str, type_: TokenType) -> dict:
+    def verify_token(token: str | None, type_: TokenType) -> Dict[str, Any]:
         try:
+            if token is None:
+                raise JWTError()
             data = jwt.decode(
                 token, settings.jwt.secret_key, algorithms=[settings.jwt.algorithm]
             )
@@ -95,20 +98,24 @@ class AuthService:
             raise INVALID_EXC
 
         payload = AuthService.verify_token(token, TokenType.ACCESS)
+        
 
-        user_id: str = payload.get("sub")
+        user_id = payload.get("sub")
         if not user_id:
             raise INVALID_EXC
 
         user = await UserService.get_by_id(db, user_id)
+        if user is None:
+            raise INVALID_EXC
 
         if user.deleted_at is not None or user.is_active is False:
             raise INVALID_EXC
 
         return user
 
-    def requires_role(required_roles: list[AccessType]):
-        def checker(user: User = Depends(AuthService.get_user_from_token)):
+    @staticmethod
+    def requires_role(required_roles: List[AccessType]) -> Callable[[User], User]:
+        def checker(user: User = Depends(AuthService.get_user_from_token)) -> User:
             if user is None or user.role not in required_roles:
                 raise AccessDeniedExc("Insufficient permissions")
             return user

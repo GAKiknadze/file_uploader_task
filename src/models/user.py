@@ -1,11 +1,15 @@
 import uuid
 from enum import Enum as PyEnum
+from typing import TYPE_CHECKING
 
 from sqlalchemy import Boolean, Column, DateTime, Enum, String
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
 from .base import Base
+
+if TYPE_CHECKING:
+    from .file import File
 
 
 class UserRole(str, PyEnum):

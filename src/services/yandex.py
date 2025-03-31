@@ -1,5 +1,6 @@
 import logging
 import uuid
+from typing import Dict, Any
 
 import httpx
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -31,7 +32,7 @@ class YandexService:
 
     @staticmethod
     async def handle_callback(
-        db: AsyncSession, code: str, state: str, cookie_state: str
+        db: AsyncSession, code: str, state: str, cookie_state: str | None = None
     ) -> User:
         if settings.yandex.check_cookie and state != cookie_state:
             logger.error("Invalid state parameter")
@@ -44,7 +45,7 @@ class YandexService:
         return await AuthService.get_or_create_user(db, user_info)
 
     @staticmethod
-    async def _get_access_token(code: str) -> dict:
+    async def _get_access_token(code: str) -> Dict[str, Any]:
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.post(
@@ -64,7 +65,7 @@ class YandexService:
             raise BadRequestExc("Failed to get access token from Yandex")
 
     @staticmethod
-    async def _get_user_info(access_token: str) -> dict:
+    async def _get_user_info(access_token: str) -> Dict[str, Any]:
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.get(
