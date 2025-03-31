@@ -72,10 +72,11 @@ class AuthService:
     def verify_token(token: str, type_: TokenType) -> dict:
         try:
             data = jwt.decode(
-                token, settings.jwt.secret, algorithms=[settings.jwt.algorithm]
+                token, settings.jwt.secret_key, algorithms=[settings.jwt.algorithm]
             )
             if data.get("type") != type_:
                 raise JWTError()
+            return data
         except JWTError:
             raise INVALID_EXC
 

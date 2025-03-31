@@ -14,7 +14,7 @@ router = APIRouter()
 
 @router.post("/refresh", response_model=Token)
 async def refresh_token(
-    refresh_token: str | None = Body(default=None),
+    refresh_token: str | None = Body(default=None, embed=True),
     db: AsyncSession = Depends(get_db),
 ) -> Token:
     token_data: dict = AuthService.verify_token(refresh_token, TokenType.REFRESH)

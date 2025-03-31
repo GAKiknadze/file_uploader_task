@@ -1,9 +1,10 @@
+import logging
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
-import logging
 from sqlalchemy import exc, select
-from .models.base import engine, Base
+
+from .models.base import Base, engine
 from .routes import auth, exc_handlers, file, user
 from .services.exceptions import (
     AccessDeniedExc,
@@ -25,6 +26,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.on_event("startup")
 async def startup_event():
     try:
@@ -32,14 +34,16 @@ async def startup_event():
             await conn.run_sync(Base.metadata.create_all)
             await conn.execute(select(1))
             logger.info("Database initialized successfully")
-            
+
     except exc.SQLAlchemyError as e:
         logger.error(f"Database initialization failed: {str(e)}")
         raise RuntimeError("Database connection error") from e
 
+
 @app.on_event("shutdown")
 async def shutdown_event():
     await engine.dispose()
+
 
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
 app.include_router(user.router, prefix="/user", tags=["user"])
