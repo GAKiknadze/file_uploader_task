@@ -23,7 +23,7 @@ class FileResponse(FileBase):
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class FileAdminResponse(FileResponse):
@@ -31,7 +31,7 @@ class FileAdminResponse(FileResponse):
     user_id: UUID
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class FileListUserResponse(BaseModel):
