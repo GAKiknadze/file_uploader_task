@@ -1,5 +1,5 @@
-import uuid
 import logging
+import uuid
 from datetime import datetime
 from pathlib import Path
 from typing import List, Optional
@@ -82,7 +82,10 @@ class FileService:
     async def upload(
         db: AsyncSession, user: User, upload_file: UploadFile
     ) -> File | None:
-        if "*" not in settings.file.supported_formats and upload_file.content_type not in settings.file.supported_formats:
+        if (
+            "*" not in settings.file.supported_formats
+            and upload_file.content_type not in settings.file.supported_formats
+        ):
             logger.debug(f"Invalid file type: {upload_file.content_type}")
             raise BadRequestExc("Invalid file type")
 

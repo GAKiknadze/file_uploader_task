@@ -1,5 +1,6 @@
-from datetime import datetime, timezone
 import logging
+from datetime import datetime, timezone
+
 from sqlalchemy import delete, desc, func, select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -9,6 +10,7 @@ from ..schemas.user import UserUpdate
 from .exceptions import BadRequestExc, ObjectNotFoundExc, SomethingWrongExc
 
 logger = logging.getLogger(__name__)
+
 
 class UserService:
     @staticmethod
