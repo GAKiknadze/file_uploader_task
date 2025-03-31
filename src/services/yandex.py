@@ -33,7 +33,7 @@ class YandexService:
     async def handle_callback(
         db: AsyncSession, code: str, state: str, cookie_state: str
     ) -> User:
-        if state != cookie_state:
+        if settings.yandex.check_cookie and state != cookie_state:
             logger.error("Invalid state parameter")
             raise BadRequestExc("Invalid state parameter")
 
@@ -52,9 +52,9 @@ class YandexService:
                     data={
                         "grant_type": "authorization_code",
                         "code": code,
-                        "client_id": settings.yandex_client_id,
-                        "client_secret": settings.yandex_client_secret,
-                        "redirect_uri": settings.yandex_redirect_uri,
+                        "client_id": settings.yandex.client_id,
+                        "client_secret": settings.yandex.client_secret,
+                        "redirect_uri": settings.yandex.client_uri,
                     },
                 )
                 response.raise_for_status()

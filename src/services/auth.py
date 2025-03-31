@@ -13,15 +13,15 @@ from ..schemas.auth import Token
 from ..services.exceptions import AccessDeniedExc, NotAuthorizedExc
 from ..services.user import UserService
 
-__INVALID_EXC = NotAuthorizedExc("Invalid token")
+INVALID_EXC = NotAuthorizedExc("Invalid token")
 
 
-class AccessType(Enum):
+class AccessType(str, Enum):
     ADMIN = "ADMIN"
     CLIENT = "CLIENT"
 
 
-class TokenType(Enum):
+class TokenType(str, Enum):
     ACCESS = "access"
     REFRESH = "refresh"
 
@@ -36,7 +36,7 @@ class AuthService:
             ),
             refresh_token=AuthService._create_token(
                 user_id,
-                settings.jwt.refresh_token_expire_minutes * 1440,
+                settings.jwt.refresh_token_expire_days * 1440,
                 TokenType.REFRESH,
             ),
         )
@@ -77,32 +77,32 @@ class AuthService:
             if data.get("type") != type_:
                 raise JWTError()
         except JWTError:
-            raise __INVALID_EXC
+            raise INVALID_EXC
 
     @staticmethod
     async def get_user_from_token(
         authorization: str | None = Header(None), db: AsyncSession = Depends(get_db)
     ) -> User | None:
         if not authorization:
-            raise __INVALID_EXC
+            raise INVALID_EXC
 
         try:
             scheme, token = authorization.split()
             if scheme.lower() != "bearer":
-                raise __INVALID_EXC
+                raise INVALID_EXC
         except ValueError:
-            raise __INVALID_EXC
+            raise INVALID_EXC
 
         payload = AuthService.verify_token(token, TokenType.ACCESS)
 
         user_id: str = payload.get("sub")
         if not user_id:
-            raise __INVALID_EXC
+            raise INVALID_EXC
 
         user = await UserService.get_by_id(db, user_id)
 
         if user.deleted_at is not None or user.is_active is False:
-            raise __INVALID_EXC
+            raise INVALID_EXC
 
         return user
 
