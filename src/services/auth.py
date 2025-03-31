@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import List, Callable, Dict, Any
+from typing import Any, Callable, Dict, List
 
 from fastapi import Depends, Header
 from jose import JWTError, jwt
@@ -53,7 +53,9 @@ class AuthService:
 
     @staticmethod
     async def get_or_create_user(db: AsyncSession, yandex_data: Dict[str, Any]) -> User:
-        result = await db.execute(select(User).where(User.yandex_id == yandex_data["id"]))
+        result = await db.execute(
+            select(User).where(User.yandex_id == yandex_data["id"])
+        )
         user = result.scalars().first()
 
         if user is None:
@@ -98,7 +100,6 @@ class AuthService:
             raise INVALID_EXC
 
         payload = AuthService.verify_token(token, TokenType.ACCESS)
-        
 
         user_id = payload.get("sub")
         if not user_id:

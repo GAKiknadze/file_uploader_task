@@ -79,9 +79,7 @@ class FileService:
         return file
 
     @staticmethod
-    async def upload(
-        db: AsyncSession, user: User, upload_file: UploadFile
-    ) -> File:
+    async def upload(db: AsyncSession, user: User, upload_file: UploadFile) -> File:
         if (
             "*" not in settings.file.supported_formats
             and upload_file.content_type not in settings.file.supported_formats
@@ -97,7 +95,7 @@ class FileService:
         filename = f"{file_id}.{file_ext}"
         file_path = user_dir / filename
         temp_path = file_path.with_suffix(".tmp")
-        
+
         new_file: File
 
         try:

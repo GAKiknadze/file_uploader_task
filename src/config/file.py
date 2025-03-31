@@ -1,7 +1,8 @@
 import json
+from typing import List
 
 from pydantic import BaseModel, Field, field_validator
-from typing import List
+
 
 class File(BaseModel):
     max_size: int = Field()
