@@ -1,2 +1,4 @@
 isort
 black
+mypy
+sqlalchemy-stubs
