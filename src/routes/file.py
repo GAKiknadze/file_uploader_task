@@ -86,7 +86,7 @@ async def get_file_info_by_id(
         return FileResponse.model_validate(file)
 
 
-@router.get("/{file_id}/download", response_class=FileResponse)
+@router.get("/{file_id}/download", response_class=FastFileResponse)
 async def download_file_by_id(
     file_id: UUID,
     user: User = Depends(
