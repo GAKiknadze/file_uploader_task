@@ -10,3 +10,7 @@ up:
 
 down:
 	docker compose down
+
+format:
+	isort .
+	black .
